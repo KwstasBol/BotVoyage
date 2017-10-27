@@ -121,6 +121,7 @@ function(session,results){
     }
  ]);    
 
+//sunarthsh gia thn dhmiourgia koubiwn me ta magazia
 function createMultipleButtons(session,places){
     var list=[];
     for(var i=0;i<5;i++){
