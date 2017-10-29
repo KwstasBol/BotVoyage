@@ -120,7 +120,16 @@ function(session,results){
       
     }
  ]);    
-
+//dokimi test paizontas
+//apothikeusi user
+bot.set('persistUserData',true);
+//get data, not sure
+var userName=session.userData.userName;
+var userProfile = session.userData.userProfile;
+session.send("User Profile:");
+for(int i = 0; i < userProfile.length, i++){
+    session.send(userProfile[i]);
+}
 //sunarthsh gia thn dhmiourgia koubiwn me ta magazia
 function createMultipleButtons(session,places){
     var list=[];
