@@ -80,7 +80,11 @@ bot.dialog('Greek',[
       
          builder.Prompts.text(session,msg);
     },
-    function(session,results){
+  
+    function(session,results,next){
+
+        if(results.response=="food"){
+            
         var msg=new builder.Message(session);
         msg.attachmentLayout(builder.AttachmentLayout.carousel);
         msg.attachments([  
@@ -98,14 +102,43 @@ bot.dialog('Greek',[
         ]); 
       
          builder.Prompts.text(session,msg);
+        }
+        else if(results.response=="hotels"){
+            next();
+        }
+    },
+    function(session,results){
+        session.dialogData.foodtype=results.response;
+        var msg=new builder.Message(session);
+        msg.attachmentLayout(builder.AttachmentLayout.carousel);
+        msg.attachments([
+            new builder.ThumbnailCard(session)
+            .title("Tοποθεσία")
+            .buttons([
+                builder.CardAction.postBack(session,"text_location","Επιλογή"),
+                builder.CardAction.postBack(session,"live_location","Αποστολή")
+            ])
+        ])
+
+        builder.Prompts.text(session,msg);
+
+    },
+    function(session,results){
+        if(results.response=="text_location"){
+            builder.Prompts.text(session,"Πληκτρολόγησε πόλη,GR ");
+        }
+        else{
+          
+        }
+
     },
     function(session,results){
         var places=[];
-       
+        session.dialogData.topothesia=results.response;
            
             var params = {
-                "near": "Ilion,GR",
-                "query":results.response,
+                "near": session.dialogData.topothesia,
+                "query":session.dialogData.foodtype,
                 "limit":5
             };
           
