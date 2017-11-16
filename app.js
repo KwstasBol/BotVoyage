@@ -5,6 +5,10 @@ var app=express();
 var bodyParser=require("body-parser");
 var foursquare = (require('foursquarevenues'))('NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ', 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V');
 var current_location=require('current-location');
+const request = require('request');
+var fs=require('fs');
+var async = require('async');
+
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -27,6 +31,7 @@ server.post('/api/messages', connector.listen());
 
 var bot = new builder.UniversalBot(connector,[
     
+
     
     //Waterfall step 1:Send language flag via a hero card at the beginning of conversation
     function(session,results,next){
@@ -139,7 +144,7 @@ bot.dialog('Greek',[
     //Waterfall step 3: Enter Location
     function(session,results){
         session.dialogData.foodtype=results.response;
-        
+        console.log("DADDDDDDDDDDDDDDDDDDD"+session.dialogData.foodtype);
 
         builder.Prompts.text(session,"Επιλογή τοποθεσίας π.χ: Athens,GR");
 
@@ -164,40 +169,161 @@ bot.dialog('Greek',[
                        places[i]=venues.response.venues[i];
                     }
 
-                   console.log(places[2]);
-                }
-                 
-            var msg=new builder.Message(session);
-            msg.attachmentLayout(builder.AttachmentLayout.carousel);
-            msg.attachments([   
-              new builder.HeroCard(session)
-              .title(places[0].name)
-              .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
-              .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
-              .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/79834828_PdzQV5BWEodefA_ZGce0UZQ40JCJ-elZRnISUULvpGg.jpg")]),
-              new builder.HeroCard(session)
-              .title(places[1].name)
-              .subtitle(places[1].location.address+"-"+places[1].location.city+"-Τηλ:"+places[1].contact.phone)
-              .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[1].name+"/"+places[1].id,"Μια καλύτερη ματιά?")])
-              .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/29378889_OUN9ldHlAny07E9fOkelPxPEr2m65Et_hx6f2SO3eE8.jpg")]),
-              new builder.HeroCard(session)
-              .title(places[2].name)
-              .subtitle(places[2].location.address+"-"+places[2].location.city+"-Τηλ:"+places[2].contact.phone)
-              .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[2].name+"/"+places[2].id,"Μια καλύτερη ματιά?")])
-              .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/2425631_QeB_Ql0fPoO-t7DuQtbWtqC2tQaJs25TmjbAdVGO0Us.jpg")]),
-              new builder.HeroCard(session)
-              .title(places[3].name)
-              .subtitle(places[3].location.address+"-"+places[3].location.city+"-Τηλ:"+places[3].contact.phone)
-              .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[3].name+"/"+places[3].id,"Μια καλύτερη ματιά?")])
-              .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/13094601_h1WxyNxjDpiqPsoTHTftIPN5gcHnT1elfJ36_eppcvo.jpg")]),
-              new builder.HeroCard(session)
-              .title(places[4].name)
-              .subtitle(places[4].location.address+"-"+places[4].location.city+"-Τηλ:"+places[4].contact.phone)
-              .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[4].name+"/"+places[4].id,"Μια καλύτερη ματιά?")])
-              .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/691450_Slz4a2_sVijQayiMbcd9iAD4dNQDHbYAGXodh0cX90Q.jpg")])
-            ]); 
-            builder.Prompts.text(session,msg);
-            });
+                   
+                }/*
+               setTimeout(function(){
+                writePhotoUrl(places[0].id);
+                writePhotoUrl(places[1].id);
+                writePhotoUrl(places[2].id);
+                writePhotoUrl(places[3].id);
+                writePhotoUrl(places[4].id);
+               },1000);
+               */
+                
+                    
+
+                    //if(err) throw err;
+                    //data=data.split("\n");     
+                    
+                   
+                        
+                                    //var urls=['https://api.foursquare.com/v2/venues/'+places[0].id+'/photos','https://api.foursquare.com/v2/venues/'+places[1].id+'/photos']
+                                 /*
+                                    var options=[{
+                                    url:'https://api.foursquare.com/v2/venues/'+places[0].id+'/photos',
+                                    json:true,
+                                    method: 'GET',
+                                    qs: {
+                                    client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
+                                    client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
+                                    v: '20171114',
+                                    limit: 1
+                                    }
+                                },
+                                {
+                                url:'https://api.foursquare.com/v2/venues/'+places[1].id+'/photos',
+                                json:true,
+                                method: 'GET',
+                                qs: {
+                                client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
+                                client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
+                                v: '20171114',
+                                limit: 1
+                                }
+                            }
+                            ]
+                             *///       request(options,function(err, res, body){
+                                   // var result="";
+                                    //if (err) {
+                                    //    console.log(err);
+                                   // } 
+                                  //  console.log(res);
+                                  const urls= [
+                                    'https://api.foursquare.com/v2/venues/'+places[0].id+'/photos',
+                                    'https://api.foursquare.com/v2/venues/'+places[1].id+'/photos',
+                                    'https://api.foursquare.com/v2/venues/'+places[2].id+'/photos',
+                                    'https://api.foursquare.com/v2/venues/'+places[3].id+'/photos',
+                                    'https://api.foursquare.com/v2/venues/'+places[4].id+'/photos'
+
+                                    
+                                  ];
+                                  async.map(urls, httpGet, function (err, res){
+                                    if (err) return console.log(err);
+                                    console.log(res[0]);
+                                    console.log(res[1]);
+                                    console.log(res[2]);
+                                    console.log(res[3]);
+                                    console.log(res[4]);
+
+                                    var msg=new builder.Message(session);
+                                    msg.attachmentLayout(builder.AttachmentLayout.carousel);
+                                    msg.attachments([   
+                                      new builder.HeroCard(session)
+                                      .title(places[0].name)
+                                      .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
+                                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
+                                      .images([ builder.CardImage.create(session,res[0].response.photos.items[0]!=undefined ?""+res[0].response.photos.items[0].prefix+"300x300"+res[0].response.photos.items[0].suffix+"":"http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")]),
+                                      new builder.HeroCard(session)
+                                      .title(places[1].name)
+                                      .subtitle(places[1].location.address+"-"+places[1].location.city+"-Τηλ:"+places[1].contact.phone)
+                                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[1].name+"/"+places[1].id,"Μια καλύτερη ματιά?")])
+                                      .images([builder.CardImage.create(session,res[1].response.photos.items[0]!=undefined ?""+res[1].response.photos.items[0].prefix+"300x300"+res[1].response.photos.items[0].suffix+"":"http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")]),
+                                      new builder.HeroCard(session)
+                                      .title(places[2].name)
+                                      .subtitle(places[2].location.address+"-"+places[1].location.city+"-Τηλ:"+places[2].contact.phone)
+                                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[2].name+"/"+places[2].id,"Μια καλύτερη ματιά?")])
+                                      .images([builder.CardImage.create(session,res[2].response.photos.items[0]!=undefined ? ""+res[2].response.photos.items[0].prefix+"300x300"+res[2].response.photos.items[0].suffix+"":"http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")]),
+                                      new builder.HeroCard(session)
+                                      .title(places[3].name)
+                                      .subtitle(places[3].location.address+"-"+places[3].location.city+"-Τηλ:"+places[3].contact.phone)
+                                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[3].name+"/"+places[3].id,"Μια καλύτερη ματιά?")])
+                                      .images([builder.CardImage.create(session,res[3].response.photos.items[0]!=undefined ? ""+res[3].response.photos.items[0].prefix+"300x300"+res[3].response.photos.items[0].suffix+"":"http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")]),
+                                      new builder.HeroCard(session)
+                                      .title(places[4].name)
+                                      .subtitle(places[4].location.address+"-"+places[4].location.city+"-Τηλ:"+places[4].contact.phone)
+                                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[4].name+"/"+places[4].id,"Μια καλύτερη ματιά?")])
+                                      .images([builder.CardImage.create(session,res[4].response.photos.items[0]!=undefined ?""+res[4].response.photos.items[0].prefix+"300x300"+res[4].response.photos.items[0].suffix+"":"http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")]) 
+                                    ])
+                                    builder.Prompts.text(session,msg);
+                                  });
+
+                                //result=body.response.photos.items[0].prefix+"300x500"+body.response.photos.items[0].suffix;
+                                /*var msg=new builder.Message(session);
+                                msg.attachmentLayout(builder.AttachmentLayout.carousel);
+                                msg.attachments([   
+                                  new builder.HeroCard(session)
+                                  .title(places[0].name)
+                                  .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
+                                  .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
+                                  .images([ builder.CardImage.create(session,""+result+"")])  
+                                 
+                                ])*//*
+                                builder.Prompts.text(session,msg);
+                                
+                            });
+                          */
+                       /* 
+                    var msg=new builder.Message(session);
+                    msg.attachmentLayout(builder.AttachmentLayout.carousel);
+                    msg.attachments([   
+                      new builder.HeroCard(session)
+                      .title(places[0].name)
+                      .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
+                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
+                      .images([ builder.CardImage.create(session,""+data[0]+"")])
+                      ,
+                      new builder.HeroCard(session)
+                      .title(places[1].name)
+                      .subtitle(places[1].location.address+"-"+places[1].location.city+"-Τηλ:"+places[1].contact.phone)
+                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[1].name+"/"+places[1].id,"Μια καλύτερη ματιά?")])
+                      .images([builder.CardImage.create(session,""+data[1]+"")]),
+                      new builder.HeroCard(session)
+                      .title(places[2].name)
+                      .subtitle(places[2].location.address+"-"+places[2].location.city+"-Τηλ:"+places[2].contact.phone)
+                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[2].name+"/"+places[2].id,"Μια καλύτερη ματιά?")])
+                      .images([builder.CardImage.create(session,""+data[2]+"")]),
+                      new builder.HeroCard(session)
+                      .title(places[3].name)
+                      .subtitle(places[3].location.address+"-"+places[3].location.city+"-Τηλ:"+places[3].contact.phone)
+                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[3].name+"/"+places[3].id,"Μια καλύτερη ματιά?")])
+                      .images([builder.CardImage.create(session,""+data[3]+"")]),
+                      new builder.HeroCard(session)
+                      .title(places[4].name)
+                      .subtitle(places[4].location.address+"-"+places[4].location.city+"-Τηλ:"+places[4].contact.phone)
+                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[4].name+"/"+places[4].id,"Μια καλύτερη ματιά?")])
+                      .images([builder.CardImage.create(session,""+data[4]+"")])
+                    ]); 
+                    
+                  */
+              
+
+
+
+
+                });
+           
+              
+           
             
     },
     //Waterfall step 5: End of dialog
@@ -279,7 +405,9 @@ bot.dialog('Greek',[
                  
             var msg=new builder.Message(session);
             msg.attachmentLayout(builder.AttachmentLayout.carousel);
-            msg.attachments([   
+            setTimeout(function(){ 
+            msg.attachments([  
+            
               new builder.HeroCard(session)
               .title(places[0].name)
               .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
@@ -306,6 +434,7 @@ bot.dialog('Greek',[
               .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[4].name+"/"+places[4].id,"Μια καλύτερη ματιά?")])
               .images([builder.CardImage.create(session,"https://igx.4sqi.net/img/general/width960/691450_Slz4a2_sVijQayiMbcd9iAD4dNQDHbYAGXodh0cX90Q.jpg")])
             ]); 
+        },2000);
             builder.Prompts.text(session,msg);
             });
            
@@ -317,12 +446,65 @@ bot.dialog('Greek',[
         session.endDialog();
     }
  ]);    
+/*
+    function writePhotoUrl(venue_id){
 
-
-
+        
+       
+      
+           
+            request({
+            url: 'https://api.foursquare.com/v2/venues/'+venue_id+'/photos',
+            json:true,
+            method: 'GET',
+            qs: {
+            client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
+            client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
+            v: '20171116',
+            limit: 1
+            }
     
-    
+        },  function(err, res, body) {
+            
+            if (err) {
+                console.log(err);
+            }
+            else{
+                var result="";
+                result=body.response.photos.items[0].prefix+"300x500"+body.response.photos.items[0].suffix;
+                
+                    fs.appendFile('./a.txt',result+'\r\n',function(err){
+                        if(err){
+                            console.log(err);
+                        }
+                        else{
+                            console.log("Ok!");
+                        }
+                    })
+            
+            } 
+        }
+    );
+}
 
-
-
+*/
+ 
+function httpGet(url, callback) {
+    const options = {
+      url :  url,
+      json : true,
+      method: 'GET',
+      qs: {
+      client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
+      client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
+      v: '20171114',
+      limit: 1
+      }
+    };
+    request(options,
+      function(err, res, body) {
+        callback(err, body);
+      }
+    );
+  }
 
