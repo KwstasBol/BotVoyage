@@ -170,54 +170,8 @@ bot.dialog('Greek',[
                     }
 
                    
-                }/*
-               setTimeout(function(){
-                writePhotoUrl(places[0].id);
-                writePhotoUrl(places[1].id);
-                writePhotoUrl(places[2].id);
-                writePhotoUrl(places[3].id);
-                writePhotoUrl(places[4].id);
-               },1000);
-               */
-                
-                    
-
-                    //if(err) throw err;
-                    //data=data.split("\n");     
-                    
-                   
-                        
-                                    //var urls=['https://api.foursquare.com/v2/venues/'+places[0].id+'/photos','https://api.foursquare.com/v2/venues/'+places[1].id+'/photos']
-                                 /*
-                                    var options=[{
-                                    url:'https://api.foursquare.com/v2/venues/'+places[0].id+'/photos',
-                                    json:true,
-                                    method: 'GET',
-                                    qs: {
-                                    client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
-                                    client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
-                                    v: '20171114',
-                                    limit: 1
-                                    }
-                                },
-                                {
-                                url:'https://api.foursquare.com/v2/venues/'+places[1].id+'/photos',
-                                json:true,
-                                method: 'GET',
-                                qs: {
-                                client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
-                                client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
-                                v: '20171114',
-                                limit: 1
-                                }
-                            }
-                            ]
-                             *///       request(options,function(err, res, body){
-                                   // var result="";
-                                    //if (err) {
-                                    //    console.log(err);
-                                   // } 
-                                  //  console.log(res);
+                }
+            
                                   const urls= [
                                     'https://api.foursquare.com/v2/venues/'+places[0].id+'/photos',
                                     'https://api.foursquare.com/v2/venues/'+places[1].id+'/photos',
@@ -267,56 +221,7 @@ bot.dialog('Greek',[
                                     builder.Prompts.text(session,msg);
                                   });
 
-                                //result=body.response.photos.items[0].prefix+"300x500"+body.response.photos.items[0].suffix;
-                                /*var msg=new builder.Message(session);
-                                msg.attachmentLayout(builder.AttachmentLayout.carousel);
-                                msg.attachments([   
-                                  new builder.HeroCard(session)
-                                  .title(places[0].name)
-                                  .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
-                                  .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
-                                  .images([ builder.CardImage.create(session,""+result+"")])  
-                                 
-                                ])*//*
-                                builder.Prompts.text(session,msg);
                                 
-                            });
-                          */
-                       /* 
-                    var msg=new builder.Message(session);
-                    msg.attachmentLayout(builder.AttachmentLayout.carousel);
-                    msg.attachments([   
-                      new builder.HeroCard(session)
-                      .title(places[0].name)
-                      .subtitle(places[0].location.address+"-"+places[0].location.city+"-Τηλ:"+places[0].contact.phone)
-                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[0].name+"/"+places[0].id,"Μια καλύτερη ματιά?")])
-                      .images([ builder.CardImage.create(session,""+data[0]+"")])
-                      ,
-                      new builder.HeroCard(session)
-                      .title(places[1].name)
-                      .subtitle(places[1].location.address+"-"+places[1].location.city+"-Τηλ:"+places[1].contact.phone)
-                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[1].name+"/"+places[1].id,"Μια καλύτερη ματιά?")])
-                      .images([builder.CardImage.create(session,""+data[1]+"")]),
-                      new builder.HeroCard(session)
-                      .title(places[2].name)
-                      .subtitle(places[2].location.address+"-"+places[2].location.city+"-Τηλ:"+places[2].contact.phone)
-                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[2].name+"/"+places[2].id,"Μια καλύτερη ματιά?")])
-                      .images([builder.CardImage.create(session,""+data[2]+"")]),
-                      new builder.HeroCard(session)
-                      .title(places[3].name)
-                      .subtitle(places[3].location.address+"-"+places[3].location.city+"-Τηλ:"+places[3].contact.phone)
-                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[3].name+"/"+places[3].id,"Μια καλύτερη ματιά?")])
-                      .images([builder.CardImage.create(session,""+data[3]+"")]),
-                      new builder.HeroCard(session)
-                      .title(places[4].name)
-                      .subtitle(places[4].location.address+"-"+places[4].location.city+"-Τηλ:"+places[4].contact.phone)
-                      .buttons([builder.CardAction.openUrl(session,"https://foursquare.com/v/"+places[4].name+"/"+places[4].id,"Μια καλύτερη ματιά?")])
-                      .images([builder.CardImage.create(session,""+data[4]+"")])
-                    ]); 
-                    
-                  */
-              
-
 
 
 
@@ -446,49 +351,8 @@ bot.dialog('Greek',[
         session.endDialog();
     }
  ]);    
-/*
-    function writePhotoUrl(venue_id){
 
-        
-       
-      
-           
-            request({
-            url: 'https://api.foursquare.com/v2/venues/'+venue_id+'/photos',
-            json:true,
-            method: 'GET',
-            qs: {
-            client_id: 'NAGACSAFQSQIWKU535EUNQSJUBO5DW01VVST0C312AV04GAZ',
-            client_secret: 'VP0SWQZWDWAHGSGHBOIVK3W4GAPIE1MTYXVGT2REZWOBZW3V',
-            v: '20171116',
-            limit: 1
-            }
-    
-        },  function(err, res, body) {
-            
-            if (err) {
-                console.log(err);
-            }
-            else{
-                var result="";
-                result=body.response.photos.items[0].prefix+"300x500"+body.response.photos.items[0].suffix;
-                
-                    fs.appendFile('./a.txt',result+'\r\n',function(err){
-                        if(err){
-                            console.log(err);
-                        }
-                        else{
-                            console.log("Ok!");
-                        }
-                    })
-            
-            } 
-        }
-    );
-}
-
-*/
- 
+ //Functions for getting Images-requests
 function httpGet(url, callback) {
     const options = {
       url :  url,
