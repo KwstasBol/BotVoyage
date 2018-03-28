@@ -41,6 +41,7 @@ var tDate='';
 var wrongFromAirport=false;
 var flightStep=0;
 var wrongToAirport=false;
+var falseDates=false;
 var a='';
 // Create chat connector for communicating with the Bot Framework Service
 var connector = new builder.ChatConnector({
@@ -348,7 +349,7 @@ bot.dialog('YourWelcome', [
 bot.dialog('Flights', [
 
     function (session,results,next) {
-        if(flightStep==2){
+        if(flightStep==2||flightStep==3){
             next();
         }
         else{
@@ -363,7 +364,7 @@ bot.dialog('Flights', [
         
     },
     function (session, results,next) {
-        if(flightStep==2){
+        if(flightStep==2||flightStep==3){
             next();
         }
         else{
@@ -380,7 +381,11 @@ bot.dialog('Flights', [
         }
     }
     },
-    function(session,results){
+    function(session,results,next){
+        if(flightStep==3){
+            next();
+        }
+        else{
         if(wrongToAirport==true){
             builder.Prompts.text(session, ' Δεν βρέθηκε!Επιλέξτε ξανά σωστό αεροδρόμιο άφιξης');
         }
@@ -388,8 +393,13 @@ bot.dialog('Flights', [
             builder.Prompts.text(session, ' Επιλέξτε αεροδρόμιο άφιξης');
             
         }
+        }
     },
-    function (session, results) {
+    function (session, results,next) {
+        if(flightStep==3){
+            next();
+        }
+        else{
         tAir = results.response;
         if(airportCityExists(tAir)==false){
             wrongToAirport=true;
@@ -399,9 +409,18 @@ bot.dialog('Flights', [
         else{
             wrongToAirport=false;
             flightStep=3;
-            builder.Prompts.text(session, ' Επιλέξτε ημερομηνία αναχώρησης M-D(π.χ 2018-04-15)');
+            next();
+        }
         }
 
+    },function(session,results,next){
+        if(falseDates==true){
+             builder.Prompts.text(session, 'Λανθασμένες ημερομηνίες!Επιλέξτε ξανά ημερομηνία αναχώρησης M-D(π.χ 2018-04-15)');
+        }
+        else{
+             builder.Prompts.text(session, ' Επιλέξτε ημερομηνία αναχώρησης M-D(π.χ 2018-04-15)');
+        }
+        
     },
    
     function (session, results) {
@@ -410,7 +429,15 @@ bot.dialog('Flights', [
     },
     function (session, results, next) {
         tDate = results.response;
-        next();
+        if(checkFlightDates(frDate,tDate)==true){
+            falseDates=false;
+            next();
+        }
+        else{
+           falseDates=true;
+           session.beginDialog('Flights');
+        }
+        
 
     },
     function (session, results) {
@@ -420,14 +447,128 @@ bot.dialog('Flights', [
             new builder.HeroCard(session)
                 .title('Υπαρκτές πτήσεις')
                 .buttons([builder.CardAction.openUrl(session, kayakUrl(frAir, tAir, frDate, tDate), 'Δες τις πτήσεις')])
-        ])
+        ]);
         builder.Prompts.text(session, msg);
     }
 
 ]).triggerAction({
     matches: 'ServicesType.flightou'
 });
+function checkFlightDates(fd,td){
+    if(afterNow(fd)==true&&validateDates(fd,td)==true){
+        return true;
+    }
+    else{
+        return false;
+    }
 
+}
+
+function getCurrentDay(){
+    var d = new Date();
+    var n ="";
+    if(d<10){
+         n="0"+d.getDate();
+    }
+    else n=d.getDate()
+   
+    return n;
+}
+function getCurrentMonth(){
+    var d = new Date();
+    var month = [];
+    month[0] = "01";
+    month[1] = "02";
+    month[2] = "03";
+    month[3] = "04";
+    month[4] = "05";
+    month[5] = "06";
+    month[6] = "07";
+    month[7] = "08";
+    month[8] = "09";
+    month[9] = "10";
+    month[10] = "11";
+    month[11] = "12";
+    var n =month[d.getMonth()];
+    return n;
+}
+function getCurrentYear(){
+    var d=new Date();
+    var n=""+d.getFullYear()+"";
+    return n;
+}
+
+
+
+function afterNow(fd){
+    var pFd=fd.split("-");
+    var pureFdYear=pFd[0];
+    var pureFdMonth=pFd[1];
+    var pureFdDay=pFd[2];
+  
+
+    if(pureFdYear<getCurrentYear()){
+        return false;
+    }
+    else if(pureFdYear>getCurrentYear()){
+        return true;
+    }
+    else if(pureFdYear==getCurrentYear()){
+        if(pureFdMonth<getCurrentMonth()){
+            return false;
+        }
+        else if(pureFdMonth>getCurrentMonth()){
+            return true;
+        }
+        else if(pureFdMonth==getCurrentMonth()){
+            if(pureFdDay<getCurrentDay()){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+    }
+    return false;
+
+
+ }
+
+function validateDates(fd,td){
+
+    var pFd=fd.split("-");
+    var pTd=td.split("-");
+    var pureFdYear=pFd[0];
+    var pureFdMonth=pFd[1];
+    var pureFdDay=pFd[2];
+    var pureTdYear=pTd[0];
+    var pureTdMonth=pTd[1];
+    var pureTdDay=pTd[2];
+
+  if(pureTdYear<pureFdYear){
+      return false;
+  }
+  else if(pureTdYear==pureFdYear){
+      if(pureTdMonth>pureFdMonth){
+          return true;
+      }
+      else if(pureTdMonth<pureFdMonth){
+          return false;
+      }
+      else if(pureTdMonth==pureFdMonth){
+          if(pureTdDay<pureFdDay){
+              return false;
+          }
+          else{
+              return true;
+          }
+      }
+  }
+  else if(pureTdYear>pureFdYear){
+      return true;
+  }
+  return false;
+}
 function airportCityExists(ap) {
     if(cityAirports[ap]!=undefined){
         return true;
@@ -448,6 +589,9 @@ function kayakUrl(fromCity,toCity,fromDate,toDate){
     var kayakUrl='https://www.gr.kayak.com/flights/'+fromAirport+'-'+toAirport+'/'+fromDate+'/'+toDate+'?sort=bestflight_a';
     return kayakUrl;
 }
+
+
+
 
 bot.dialog('showGoogle',[
     function(session){
