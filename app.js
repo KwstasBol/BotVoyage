@@ -441,6 +441,7 @@ bot.dialog('Flights', [
 
     },
     function (session, results) {
+        flightStep=0;
         var msg = new builder.Message(session);
         msg.attachmentLayout(builder.AttachmentLayout.carousel);
         msg.attachments([
@@ -449,6 +450,10 @@ bot.dialog('Flights', [
                 .buttons([builder.CardAction.openUrl(session, kayakUrl(frAir, tAir, frDate, tDate), 'Δες τις πτήσεις')])
         ]);
         builder.Prompts.text(session, msg);
+    },
+    function(session){
+       
+        session.endConversation();
     }
 
 ]).triggerAction({
