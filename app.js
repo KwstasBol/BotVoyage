@@ -11,11 +11,13 @@ var foursquare = (require('foursquarevenues'))('NAGACSAFQSQIWKU535EUNQSJUBO5DW01
 const request = require('request');
 var async = require('async');
 const fetchAirportData = require('fetch-airport-data')
-const { WitRecognizer } = require('botbuilder-wit-remade');
+const{ WitRecognizer } = require('botbuilder-wit-remade');
 var random = require('random-number-generator');
 var Wit = require('node-wit').Wit;
 var what_type = "";
 var language="";
+var food_step=1;
+var drink_step=1;
 var quickReplies = require('botbuilder-quickreplies');
 var client = new Wit({
     accessToken: '4RZ3GZTLM6KIITPFMROKAXZYJNQLI2JV'
@@ -148,7 +150,7 @@ bot.dialog('Hello', [
     }
 
 ]).triggerAction({
-    matches: 'Language.ellhnasego'
+    matches: 'Greetings.grekoss'
 });
 
 bot.dialog('Eng_Hello', [
@@ -163,7 +165,43 @@ bot.dialog('Eng_Hello', [
         session.endDialog();
     }
 ]).triggerAction({
-    matches: 'Language.agglouego'
+    matches: 'Greetings.englezozz'
+});
+bot.dialog('Efkaristo', [
+
+    function (session, results) {
+
+        //Check if it is greek, then begin Greek_Intro
+
+        builder.Prompts.text(session, 'Να σαι καλά φίλε μου!');
+        //session.beginDialog('Intro');
+
+        //Else begin English_Intro
+
+
+    },
+    //Step 2- End of dialog
+    function (session, results) {
+        session.endDialog();
+    }
+
+]).triggerAction({
+    matches: 'Thankfulness.greekozz'
+});
+
+bot.dialog('Eng_Efkaristo', [
+
+    function (session, results) {
+        //Check if it is greek, then begin Greek_Intro
+        builder.Prompts.text(session,'No problem my friend!');
+        //session.beginDialog('Intro');
+    },
+    //Step 2- End of dialog
+    function (session, results) {
+        session.endDialog();
+    }
+]).triggerAction({
+    matches: 'Thankfulness.englezoua'
 });
 //Core - The basic menu
 bot.dialog('Core', [
@@ -171,33 +209,15 @@ bot.dialog('Core', [
     function (session, results, next) {
         client.message(session.message.text, {}).then((data) => {
              var wit_value="";
-            if(data.entities.Category_Type!=undefined){
-                wit_value = data.entities.Category_Type[0].value;
+            if(data.entities.CategoryType==undefined){
+               
+                 wit_value="empty";
             }
-            else{
-                wit_value="empty";
-            }       
-            console.log(JSON.stringify(wit_value));
-            if (wit_value == 'food') {
-                session.beginDialog('Food');
-            }
-            else if (wit_value == 'hotels') {
-                session.beginDialog('Hotels');
-            }
-            else if (wit_value == 'transports') {
-                session.beginDialog('Transports');
-            }
-            else if (wit_value == 'drink') {
-                session.beginDialog('Drinks');
-
-            }
-            else if (wit_value == 'hospitals') {
-                session.beginDialog('Hospitals')
-            }
-            else if(wit_value=='empty') {
+              
+             if(wit_value=='empty') {
                 session.send(session.userData.lingua == 'greek' ? 'Με συγχωρείς, δεν κατάλαβα το αίτημα σου' : 'Sorry i did not understand you');
             }
-        })
+        });
     },
     //Step 2- End of dialog
     function (session, results) {
@@ -205,21 +225,54 @@ bot.dialog('Core', [
     }
 ]);
 
+bot.dialog('StartOver',[
+    function(session){
+        if(session.userData.lingua=='greek'){
+            session.beginDialog('Hello');
+        }
+        else{
+            session.beginDialog('Eng_Hello');
+        }
+        
+    }
+]).triggerAction({
+    matches: 'StartOvera.startoaga'
+});
+
 //Food
 bot.dialog('Food', [
     //Step 1- User input for which category of food
-    function (session) {
+    function (session,results,next) {
         session.sendTyping();
-        builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Τι τραβά η όρεξη σου? Πίτσα,σουβλάκι,μεξικάνικο,burger..? Μη μου πεις sushi :P" : 'Would you like pizza,sushi,mexican or burger?');
+        if(food_step==2){
+            builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Δεν σερβίρει το μαγαζί από αυτό" : 'We dont serve this');
+            food_step=1;
+            next();
+        }
+        else{
+             builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Τι τραβά η όρεξη σου? Πίτσα,σουβλάκι,μεξικάνικο,burger..? Μη μου πεις sushi :P" : 'Would you like pizza,sushi,mexican or burger?');
+        }
+       
     },
     //Step 2- Find the category with wit.ai
-    function (session, results) {
+    function (session, results,next) {
         client.message(results.response, {}).then((data) => {
-            var wit_value = JSON.stringify(data.entities.Food_Type[0].value);
+            var wit_value = JSON.stringify(data.entities.CategoryType);
+            console.log(wit_value);
             what_type = wit_value;
+            if(wit_value==undefined){
+                wit_value='empty';
+                food_step=2;
+                session.beginDialog('Food');
+            }
+               
+             else if(wit_value!='empty') {
+                
+            }
         });
         session.sendTyping();
-        builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Εισαγωγή τοποθεσίας" : 'Enter location');
+        
+      
     },
     //Step 3- Find the venues via Foursquare
     function (session, results) {
@@ -231,7 +284,7 @@ bot.dialog('Food', [
         session.beginDialog('Intro');
     }
 ]).triggerAction({
-    matches: 'CategoryType.food'
+    matches: 'CategoryType.foodaaa'
 });
 
 
@@ -252,24 +305,42 @@ createDialog('museums','ServicesType.museouma','foursquare');
 createDialog('theater','ServicesType.theatrothe','foursquare');
 createDialog('Historic Site','ServicesType.historicosito','foursquare');
 createDialog('pharmacy','ServicesType.Pharmakeioure!','google');
+createDialog('seesights','ServicesType.Seesights!','foursquare');
 
 
 
 //Drinks
 bot.dialog('Drinks', [
     //Step 1- User input for which category of drink
-    function (session) {
-        session.sendTyping();
-        builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Τι θέλεις να πιείς?Κοκτέιλ,Μπιρίτσα,Κρασάκι.." : 'Would you like to drink beer,cocktail or wine?');
+    function (session,results,next) {
+         session.sendTyping();
+        if(drink_step==2){
+            builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Δεν σερβίρει το μαγαζί από αυτό" : 'We dont serve this');
+            drink_step=1;
+            next();
+        }
+        else{
+              builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Τι θέλεις να πιείς?Κοκτέιλ,Μπιρίτσα,Κρασάκι.." : 'Would you like to drink beer,cocktail or wine?');
+        }
+      
     },
     //Step 2- Find the category with wit.ai
     function (session, results) {
         client.message(results.response, {}).then((data) => {
-            var wit_value = JSON.stringify(data.entities.Drink_Type[0].value)
-            what_type = wit_value;
+            var wit_value = JSON.stringify(data.entities.CategoryType);
+             if(wit_value==undefined){
+                wit_value='empty';
+                drink_step=2;
+                session.beginDialog('Drinks');
+            }
+               
+             else if(wit_value!='empty') {
+                
+            }
         });
+      
         session.sendTyping();
-        builder.Prompts.text(session, session.userData.lingua == 'greek' ? "Εισαγωγή τοποθεσίας" : 'Enter location');
+        
     },
     //Step 3- Find the venues via Foursquare
     function (session, results) {
@@ -281,7 +352,7 @@ bot.dialog('Drinks', [
         session.beginDialog('Core');
     }
 ]).triggerAction({
-    matches: 'CategoryType.drink'
+    matches: 'CategoryType.drinkaa'
 });
 
 
@@ -299,14 +370,10 @@ bot.dialog('Help', [
         session.beginDialog('Intro');
     }
 ]).triggerAction({
-    matches: 'Help.help'
+    matches: 'Help.helpara'
 });
 
-bot.dialog('Hotels',[
-    
-]).triggerAction({
-    matches: 'Help.help'
-});
+
 
 bot.dialog('YourWelcome', [
 
@@ -440,7 +507,7 @@ bot.dialog('Flights', [
         
 
     },
-    function (session, results) {
+    function (session, results,next) {
         flightStep=0;
         var msg = new builder.Message(session);
         msg.attachmentLayout(builder.AttachmentLayout.carousel);
@@ -450,6 +517,7 @@ bot.dialog('Flights', [
                 .buttons([builder.CardAction.openUrl(session, kayakUrl(frAir, tAir, frDate, tDate), 'Δες τις πτήσεις')])
         ]);
         builder.Prompts.text(session, msg);
+        next();
     },
     function(session){
        
@@ -769,35 +837,35 @@ function findPlaces(session, results) {
                 msg.attachments([
                     places[0]!=undefined?new builder.HeroCard(session)
                         .title(places[0].name)
-                        .subtitle(places[0].location.address + "-" + places[0].location.city + " - " + places[0].contact.phone)
+                        .subtitle(places[0].location.address + "-" + places[0].location.city )
                         .buttons([builder.CardAction.openUrl(session, "https://foursquare.com/v/" + places[0].name + "/" + places[0].id, session.userData.lingua == 'greek' ?"Μια καλύτερη ματιά?":"View more?")])
                         .images([builder.CardImage.create(session, res[0].response.photos.items[0] != undefined ? "" + res[0].response.photos.items[0].prefix + "300x300" + res[0].response.photos.items[0].suffix + "" : "http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")])
                         :null,
                     places[1]!=undefined?new builder.HeroCard(session)
                         .title(places[1].name)
-                        .subtitle(places[1].location.address + "-" + places[1].location.city + " - " + places[1].contact.phone)
+                        .subtitle(places[1].location.address + "-" + places[1].location.city  )
                         .buttons([builder.CardAction.openUrl(session, "https://foursquare.com/v/" + places[1].name + "/" + places[1].id,session.userData.lingua == 'greek' ?"Μια καλύτερη ματιά?":"View more?")])
                         .images([builder.CardImage.create(session, res[1].response.photos.items[0] != undefined ? "" + res[1].response.photos.items[0].prefix + "300x300" + res[1].response.photos.items[0].suffix + "" : "http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")])
                         :null,
                    places[2]!=undefined?new builder.HeroCard(session)
                         .title(places[2].name)
-                        .subtitle(places[2].location.address + "-" + places[1].location.city + " - " + places[2].contact.phone)
+                        .subtitle(places[2].location.address + "-" + places[2].location.city  )
                         .buttons([builder.CardAction.openUrl(session, "https://foursquare.com/v/" + places[2].name + "/" + places[2].id, session.userData.lingua == 'greek' ?"Μια καλύτερη ματιά?":"View more?")])
                         .images([builder.CardImage.create(session, res[2].response.photos.items[0] != undefined ? "" + res[2].response.photos.items[0].prefix + "300x300" + res[2].response.photos.items[0].suffix + "" : "http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")])
                         :null,
                    places[3]!=undefined?new builder.HeroCard(session)
                         .title(places[3].name)
-                        .subtitle(places[3].location.address + "-" + places[3].location.city + " - " + places[3].contact.phone)
+                        .subtitle(places[3].location.address + "-" + places[3].location.city  )
                         .buttons([builder.CardAction.openUrl(session, "https://foursquare.com/v/" + places[3].name + "/" + places[3].id, session.userData.lingua == 'greek' ?"Μια καλύτερη ματιά?":"View more?")])
                         .images([builder.CardImage.create(session, res[3].response.photos.items[0] != undefined ? "" + res[3].response.photos.items[0].prefix + "300x300" + res[3].response.photos.items[0].suffix + "" : "http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")])
                         :null,
                     places[4]!=undefined?new builder.HeroCard(session)
                         .title(places[4].name)
-                        .subtitle(places[4].location.address + "-" + places[4].location.city + " - " + places[4].contact.phone)
+                        .subtitle(places[4].location.address + "-" + places[4].location.city  )
                         .buttons([builder.CardAction.openUrl(session, "https://foursquare.com/v/" + places[4].name + "/" + places[4].id, session.userData.lingua == 'greek' ?"Μια καλύτερη ματιά?":"View more?")])
                         .images([builder.CardImage.create(session, res[4].response.photos.items[0] != undefined ? "" + res[4].response.photos.items[0].prefix + "300x300" + res[4].response.photos.items[0].suffix + "" : "http://www.kashmirnewsobserver.com/newsimages/noimage.jpg")])
                         :null
-                ])
+                ]);
                 builder.Prompts.text(session, msg);
             });
       }
